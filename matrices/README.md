@@ -1,2 +1,2 @@
 # writeBinaries
-put the binary matrices in this direcotry
+put the binary matrices in this directory
