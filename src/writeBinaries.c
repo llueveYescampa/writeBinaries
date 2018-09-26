@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     int n,myVoid,nnz;
     int *rows, *cols;
     real *vals;
-    https://www.qwant.com/?q=corrupted+size+vs.+prev_size&client=opensearch
+    
     if (!fscanf(fp,"%d %d %d", &n, &n, &nnz)) exit(-1);
     rows = (int *) malloc((n+1)*sizeof(int));    
     cols = (int *) malloc(nnz*sizeof(int));    
