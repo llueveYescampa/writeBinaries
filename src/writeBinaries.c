@@ -5,6 +5,25 @@
 
 #include "real.h"
 
+void meanAndSd(real *mean, real *sd,real *data, int n)
+{
+    real sum = (real) 0.0; 
+    real standardDeviation = (real) 0.0;
+
+    for(int i=0; i<n; ++i) {
+        sum += data[i];
+    } // end for //
+
+    *mean = sum/n;
+
+    for(int i=0; i<n; ++i) {
+        standardDeviation += pow(data[i] - *mean, 2);
+    } // end for //
+    *sd=sqrt(standardDeviation/n);
+    
+} // end of meanAndSd //
+
+
 #define SIZE 255
 int main(int argc, char *argv[]) 
 {
@@ -61,6 +80,16 @@ int main(int argc, char *argv[])
         fwrite(rows,sizeof(int), (n+1), ptr_myfile);
         fwrite(cols,sizeof(int), (nnz), ptr_myfile);
         fwrite(vals,sizeof(real),(nnz), ptr_myfile);
+        
+        real *nnzPR=(real *) malloc(n*sizeof(real));
+        real meanNnzPerRow,sd;
+        for (int row=0; row<n; ++row) {
+            nnzPR[row] = rows[row+1] - rows[row];
+        } // end for //
+        meanAndSd(&meanNnzPerRow,&sd,nnzPR, n);
+        free(nnzPR);
+        fwrite(&meanNnzPerRow,sizeof(real),1, ptr_myfile);
+        fwrite(&sd,sizeof(real),1, ptr_myfile);
 	} else {    
         printf("Unable to open matrix file!");
         return -1;
