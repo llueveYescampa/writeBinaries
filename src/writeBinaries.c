@@ -62,6 +62,10 @@ int main(int argc, char *argv[])
     for (int i=0; i<nnz; ++i) {
         if (!fscanf(fp,"%d %d %lf", &myVoid, (cols+i), (vals+i))) ;
         if (myVoid != rowVal) {
+        
+            for (int j=rowVal+1; j<myVoid; ++j) {
+                rows[j]=rows[j-1];
+            }//
             rows[myVoid]=i;
             rowVal=myVoid;            
         } // end if //
@@ -69,7 +73,6 @@ int main(int argc, char *argv[])
     rows[n]=nnz;
     // end of creating the row pointer vector     
     fclose(fp);
-
     FILE *ptr_myfile;
 
     // opening binary file for matrix in CSR format //
