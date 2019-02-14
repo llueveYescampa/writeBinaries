@@ -46,35 +46,41 @@ int main(int argc, char *argv[])
     strcpy(binaryFilename, argv[1]);
     strcat(binaryFilename,"_bin" );
 
-    int n,myVoid,nnz;
+    int n,currentRow,nnz;
     int *rows, *cols;
     real *vals;
     
     if (!fscanf(fp,"%d %d %d", &n, &n, &nnz)) exit(-1);
-    rows = (int *) malloc((n+1)*sizeof(int));    
-    cols = (int *) malloc(nnz*sizeof(int));    
+    rows = (int *)  calloc((n+1),sizeof(int));    
+    cols = (int *)  malloc(nnz*sizeof(int));    
     vals = (real *) malloc(nnz*sizeof(real));
     
-    int rowVal = 0;
-    rows[0] = 0;
-    
     // creating the row pointer vector     
-    for (int i=0; i<nnz; ++i) {
-        if (!fscanf(fp,"%d %d %lf", &myVoid, (cols+i), (vals+i))) ;
-        if (myVoid != rowVal) {
+    int previousRow = 0;
+    rows[0] = 0;
+    if (!fscanf(fp,"%d %d %lf", &currentRow, (cols), (vals))) exit(-1);
+    previousRow=currentRow;
+    int nnzPerRow=1;
+    for (int i=1; i<nnz; ++i) {
+        if (!fscanf(fp,"%d %d %lf", &currentRow, (cols+i), (vals+i))) exit(-1);
         
-            for (int j=rowVal+1; j<myVoid; ++j) {
-                rows[j]=rows[j-1];
-            }//
-            rows[myVoid]=i;
-            rowVal=myVoid;            
+        if (currentRow == previousRow) {
+            ++nnzPerRow;    
+        } else {
+            rows[previousRow+1]=nnzPerRow;
+            nnzPerRow=1;
+            previousRow=currentRow;
         } // end if //
     } // end for //
-    rows[n]=nnz;
+    rows[n]=nnzPerRow;
+    
+    for (int row=0; row<=n; ++row) {
+        rows[row+1] += rows[row];
+    } // end for //
+    
     // end of creating the row pointer vector     
     fclose(fp);
     FILE *ptr_myfile;
-
     // opening binary file for matrix in CSR format //
     ptr_myfile=fopen(binaryFilename,"wb");
     if (ptr_myfile) {
@@ -100,17 +106,18 @@ int main(int argc, char *argv[])
     fclose(ptr_myfile); // closing binary file for matrix in CSR format //
     // end of opening binary file for matrix in CSR format //
 
-
-
     real *x;
     x = (real *) calloc(n,sizeof(real));
     // creating an solution file 
+    //int acum=0;
     for (int row=0, k=0; row<n; ++row) {
         int nnzPr = rows[row+1] - rows[row];
+        //acum +=nnzPr;
         for (int i=0; i<nnzPr; ++i, ++k) {
             x[row] += (cols[k]+1)*vals[k];
         } // end for //
     } // end for //
+    
     free(binaryFilename);
     binaryFilename = (char *) malloc(SIZE*sizeof(char));
     memset(binaryFilename, '\0', SIZE );
