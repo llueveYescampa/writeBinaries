@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
         printf("Use: %s  filename \n", argv[0]);       
         exit(0);
     } // endif //
+    
+    const size_t length = strlen(argv[1])-2;
 
     char *binaryFilename;
     binaryFilename = (char *) malloc(SIZE*sizeof(char));
@@ -74,7 +76,8 @@ int main(int argc, char *argv[])
     } // end for //
     rows[n]=nnzPerRow;
     
-    for (int row=0; row<=n; ++row) {
+    //for (int row=0; row<=n; ++row) {  // I fixed this line on Fri 11 Sep 2020 09:53:38 AM CDT 
+    for (int row=0; row<n; ++row) {
         rows[row+1] += rows[row];
     } // end for //
     
@@ -115,13 +118,14 @@ int main(int argc, char *argv[])
         //acum +=nnzPr;
         for (int i=0; i<nnzPr; ++i, ++k) {
             x[row] += (cols[k]+1)*vals[k];
+            //x[row] += vals[k];
         } // end for //
     } // end for //
     
     free(binaryFilename);
     binaryFilename = (char *) malloc(SIZE*sizeof(char));
     memset(binaryFilename, '\0', SIZE );
-    strncpy(binaryFilename, argv[1], (strlen(argv[1])-2));
+    strncpy(binaryFilename, argv[1], length);
     strcat(binaryFilename,"out_bin" );
     ptr_myfile=fopen(binaryFilename,"wb"); // opening binary file for input vector //
     if (ptr_myfile) {
@@ -136,10 +140,11 @@ int main(int argc, char *argv[])
     // sequence of real numbers from 1.0 to n
     for (int row=0; row<n; ++row) {
         x[row] = (real) (row+1);
+        //x[row] = 1.0;
     } // end for //
 
     memset(binaryFilename, '\0', SIZE );
-    strncpy(binaryFilename, argv[1], (strlen(argv[1])-2));
+    strncpy(binaryFilename, argv[1], length  );
     strcat(binaryFilename,"in_bin" );
     
     ptr_myfile=fopen(binaryFilename,"wb"); // opening binary file for input vector //
